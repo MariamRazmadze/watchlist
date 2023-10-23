@@ -71,6 +71,22 @@ export function MovieDetails({
     onAddWatched(newWatchedMovie);
     onCloseMovie();
   }
+
+  useEffect(
+    function () {
+      function callback(e: KeyboardEvent) {
+        if (e.code === "Escape") {
+          onCloseMovie();
+        }
+      }
+      document.addEventListener("keydown", callback);
+      return function () {
+        document.removeEventListener("keydown", callback);
+      };
+    },
+    [onCloseMovie]
+  );
+
   useEffect(
     function () {
       async function getMovieDetails() {
@@ -86,6 +102,19 @@ export function MovieDetails({
     },
     [selectedId]
   );
+
+  useEffect(
+    function () {
+      if (!title) return;
+      document.title = `Watchlist | ${title}`;
+
+      return function () {
+        document.title = "Watchlist";
+      };
+    },
+    [title]
+  );
+
   return (
     <StyledDetails>
       {isLoading ? (

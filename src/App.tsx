@@ -1,6 +1,5 @@
 import GlobalStyles from "./components/General/GlobalStyles";
 import { ThemeProvider } from "styled-components";
-import { Helmet } from "react-helmet";
 import Navbar from "./components/Header/Navbar";
 import Main, { MovieData } from "./components/Watchlist/Main";
 import { WatchedMovieData } from "./components/Watchlist/Main";
@@ -55,12 +54,14 @@ export default function App() {
 
   useEffect(
     function () {
+      const controller = new AbortController();
       async function fetchMovies() {
         try {
           setIsLoading(true);
           setError("");
           const res = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+            { signal: controller.signal }
           );
 
           if (!res.ok) throw new Error("Something went wrong");
@@ -68,9 +69,12 @@ export default function App() {
           const data = await res.json();
           if (data.Response === "False") throw new Error("Movie not found");
           setMovies(data.Search);
+          setError("");
         } catch (err) {
           const error = err as Error;
-          setError(error.message);
+          if (error.name !== "AbortError") {
+            setError(error.message);
+          }
         } finally {
           setIsLoading(false);
         }
@@ -80,19 +84,17 @@ export default function App() {
         setError("");
         return;
       }
+      handleCloseMovie();
       fetchMovies();
+      return function () {
+        controller.abort();
+      };
     },
     [query]
   );
   return (
     <ThemeProvider theme={defaultTheme}>
       <GlobalStyles />
-      <Helmet>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap"
-          rel="stylesheet"
-        />
-      </Helmet>
       <Navbar movies={movies} query={query} setQuery={setQuery} />
       <Main>
         <Box height="30vh">
