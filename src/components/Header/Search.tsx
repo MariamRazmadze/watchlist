@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { useEffect, useRef } from "react";
 const StyledSearch = styled.input`
   justify-self: center;
   border: none;
@@ -30,12 +31,30 @@ interface SearchProps {
 }
 
 export default function Search({ query, setQuery }: SearchProps) {
+  const inputEl = useRef<HTMLInputElement>(null);
+  useEffect(
+    function () {
+      function callback(e: KeyboardEvent) {
+        if (document.activeElement === inputEl.current) return;
+        if (e.code === "Enter") {
+          if (inputEl.current !== null) {
+            inputEl.current.focus();
+            setQuery("");
+          }
+        }
+      }
+      document.addEventListener("keydown", callback);
+      return () => document.addEventListener("keydown", callback);
+    },
+    [setQuery]
+  );
   return (
     <StyledSearch
       type="text"
       placeholder="Search movies..."
       value={query}
       onChange={(e) => setQuery(e.target.value)}
+      ref={inputEl}
     />
   );
 }
