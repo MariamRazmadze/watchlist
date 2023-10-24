@@ -8,7 +8,7 @@ const StyledSearch = styled.input`
   width: 40rem;
   transition: all 0.3s;
   color: ${({ theme }) => theme.text};
-  background-color: ${({ theme }) => theme.primary};
+  background-color: #ff7575;
   &::placeholder {
     color: ${({ theme }) => theme.textDark};
   }

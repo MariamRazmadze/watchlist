@@ -19,8 +19,8 @@ const defaultTheme = {
   darkRed: "#e03131;",
   userRating: "#5799EF",
   imdbRating: "#F5C518",
-  text: "#fbf2f2;",
-  textDark: " #595959;",
+  text: "#fbf2f2",
+  textDark: "#7d7d7d",
   background: "#212529",
   box: "#2b3035;",
   list: "#343a40;",
@@ -30,11 +30,15 @@ export const KEY = "4a044080";
 
 export default function App() {
   const [movies, setMovies] = useState<MovieData[]>([]);
-  const [watched, setWatched] = useState<WatchedMovieData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  // const [watched, setWatched] = useState<WatchedMovieData[]>([]);
+  const [watched, setWatched] = useState<WatchedMovieData[]>(function () {
+    const storedValue = localStorage.getItem("watched");
+    return storedValue ? JSON.parse(storedValue) : [];
+  });
 
   function handleSelectMovie(id: string): void {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -46,11 +50,19 @@ export default function App() {
 
   function handleAddWatched(movie: WatchedMovieData): void {
     setWatched((watched) => [...watched, movie]);
+    // localStorage.setItem("watched", JSON.stringify([...watched, movie]));
   }
 
   function handleDeleteWatched(id: string): void {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
+
+  useEffect(
+    function () {
+      localStorage.setItem("watched", JSON.stringify(watched));
+    },
+    [watched]
+  );
 
   useEffect(
     function () {
