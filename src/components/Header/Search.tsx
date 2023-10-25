@@ -1,5 +1,6 @@
 import styled from "styled-components";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
+import { useKey } from "../../customHooks/useKey";
 const StyledSearch = styled.input`
   justify-self: center;
   border: none;
@@ -32,22 +33,15 @@ interface SearchProps {
 
 export default function Search({ query, setQuery }: SearchProps) {
   const inputEl = useRef<HTMLInputElement>(null);
-  useEffect(
-    function () {
-      function callback(e: KeyboardEvent) {
-        if (document.activeElement === inputEl.current) return;
-        if (e.code === "Enter") {
-          if (inputEl.current !== null) {
-            inputEl.current.focus();
-            setQuery("");
-          }
-        }
-      }
-      document.addEventListener("keydown", callback);
-      return () => document.addEventListener("keydown", callback);
-    },
-    [setQuery]
-  );
+
+  useKey("Enter", function () {
+    if (document.activeElement === inputEl.current) return;
+    if (inputEl.current !== null) {
+      inputEl.current.focus();
+      setQuery("");
+    }
+  });
+
   return (
     <StyledSearch
       type="text"

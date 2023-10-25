@@ -5,6 +5,7 @@ import { WatchedMovieData } from "./Main";
 import { IoMdArrowBack } from "react-icons/io";
 import StarRating from "../Starrating/StarRating";
 import { KEY } from "../../App";
+import { useKey } from "../../customHooks/useKey";
 import {
   StyledDetails,
   DetailsOverview,
@@ -72,20 +73,7 @@ export function MovieDetails({
     onCloseMovie();
   }
 
-  useEffect(
-    function () {
-      function callback(e: KeyboardEvent) {
-        if (e.code === "Escape") {
-          onCloseMovie();
-        }
-      }
-      document.addEventListener("keydown", callback);
-      return function () {
-        document.removeEventListener("keydown", callback);
-      };
-    },
-    [onCloseMovie]
-  );
+  useKey("Escape", onCloseMovie);
 
   useEffect(
     function () {
